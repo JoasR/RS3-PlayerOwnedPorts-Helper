@@ -3,7 +3,7 @@
 // =============================
 let crew = JSON.parse(localStorage.getItem("crew") || "[]");
 let captains = JSON.parse(localStorage.getItem("captains") || "[]")
-let ship = JSON.parse(localStorage.getItem("ship") || '{"selections":{}}' )
+let ship = JSON.parse(localStorage.getItem("ship")) || { selections: {}, morale: 0, combat: 0, seafaring: 0 };
 
 // =============================
 // Crew Functions
@@ -83,30 +83,47 @@ function renderCaptains() {
 // =============================
 // Ship Functions
 // =============================
+
 // Placeholder upgrades data
 const shipUpgrades = {
-  Deck1: [{name:"Deck A", morale:2, combat:1, seafaring:0}, {name:"Deck B", morale:1, combat:2, seafaring:1}],
-  Deck2: [{name:"Deck C", morale:0, combat:1, seafaring:2}, {name:"Deck D", morale:1, combat:0, seafaring:1}],
-  Rudder: [{name:"Rudder A", morale:0, combat:1, seafaring:2}, {name:"Rudder B", morale:1, combat:0, seafaring:1}],
-  Ram: [{name:"Ram A", morale:2, combat:2, seafaring:0}, {name:"Ram B", morale:1, combat:1, seafaring:1}],
-  Hull: [{name:"Hull A", morale:1, combat:2, seafaring:1}, {name:"Hull B", morale:0, combat:1, seafaring:2}]
+  Deck1: [
+    {name:"Deck A", morale:2, combat:1, seafaring:0},
+    {name:"Deck B", morale:1, combat:2, seafaring:1}
+  ],
+  Deck2: [
+    {name:"Deck C", morale:0, combat:1, seafaring:2},
+    {name:"Deck D", morale:1, combat:0, seafaring:1}
+  ],
+  Rudder: [
+    {name:"Rudder A", morale:0, combat:1, seafaring:2},
+    {name:"Rudder B", morale:1, combat:0, seafaring:1}
+  ],
+  Ram: [
+    {name:"Ram A", morale:2, combat:2, seafaring:0},
+    {name:"Ram B", morale:1, combat:1, seafaring:1}
+  ],
+  Hull: [
+    {name:"Hull A", morale:1, combat:2, seafaring:1},
+    {name:"Hull B", morale:0, combat:1, seafaring:2}
+  ]
 };
 
 let tempSelections = {}; // temporary selections before saving
-
 
 function saveShip() {
   const ship = JSON.parse(localStorage.getItem("ship")) || { selections: {}, morale: 0, combat: 0, seafaring: 0 };
 
   ship.selections = { ...tempSelections };
 
-  // Calculate totals dynamically
+  // Calculate totals
   let totalMorale = 0, totalCombat = 0, totalSeafaring = 0;
-  for (const [cat, idx] of Object.entries(ship.selections)) {
-    const upgrade = shipUpgrades[cat][idx];
-    totalMorale += upgrade.morale;
-    totalCombat += upgrade.combat;
-    totalSeafaring += upgrade.seafaring;
+  for (const [cat, indices] of Object.entries(ship.selections)) {
+    indices.forEach(idx => {
+      const upgrade = shipUpgrades[cat][idx];
+      totalMorale += upgrade.morale;
+      totalCombat += upgrade.combat;
+      totalSeafaring += upgrade.seafaring;
+    });
   }
 
   ship.morale = totalMorale;
@@ -116,7 +133,6 @@ function saveShip() {
   localStorage.setItem("ship", JSON.stringify(ship));
   alert("Ship upgrades saved!");
 }
-
 
 function renderShip() {
   const ship = JSON.parse(localStorage.getItem("ship")) || { selections: {}, morale: 0, combat: 0, seafaring: 0 };
@@ -128,37 +144,49 @@ function renderShip() {
     if (!section) continue;
     section.innerHTML = ""; // clear previous content
 
+    const selectedIndices = tempSelections[cat] ?? ship.selections[cat] ?? [];
+
     list.forEach((upg, i) => {
-      const selectedIndex = tempSelections[cat] ?? ship.selections[cat];
-      const checked = selectedIndex === i ? "checked" : "";
+      const checked = selectedIndices.includes(i) ? "checked" : "";
       section.innerHTML += `
         <label>
-          <input type="radio" name="${cat}" value="${i}" ${checked}>
+          <input type="checkbox" name="${cat}" value="${i}" ${checked}>
           ${upg.name} (M:${upg.morale} C:${upg.combat} S:${upg.seafaring})
         </label><br>
       `;
     });
 
-    // Add stats of currently selected upgrade
-    const selectedIndex = tempSelections[cat] ?? ship.selections[cat];
-    if (selectedIndex != null) {
-      const upgrade = list[selectedIndex];
+    // Add stats of selected upgrades
+    selectedIndices.forEach(idx => {
+      const upgrade = list[idx];
       totalMorale += upgrade.morale;
       totalCombat += upgrade.combat;
       totalSeafaring += upgrade.seafaring;
-    }
+    });
   }
 
   // Update totals display
-  document.getElementById("shipTotals").innerText = `Morale: ${totalMorale} | Combat: ${totalCombat} | Seafaring: ${totalSeafaring}`;
+  document.getElementById("shipTotals").innerText =
+    `Morale: ${totalMorale} | Combat: ${totalCombat} | Seafaring: ${totalSeafaring}`;
 
   // Add change listeners
-  document.querySelectorAll("input[type=radio]").forEach(r => r.addEventListener("change", e => {
-    tempSelections[e.target.name] = parseInt(e.target.value);
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", e => {
+    const cat = e.target.name;
+    const idx = parseInt(e.target.value);
+
+    if (!tempSelections[cat]) tempSelections[cat] = [];
+
+    if (e.target.checked) {
+      // add if not already
+      if (!tempSelections[cat].includes(idx)) tempSelections[cat].push(idx);
+    } else {
+      // remove if unchecked
+      tempSelections[cat] = tempSelections[cat].filter(i => i !== idx);
+    }
+
     renderShip(); // re-render to update totals dynamically
   }));
 }
-
 
 // =============================
 // Optimizer
@@ -167,6 +195,10 @@ function calculateSuccess(setup, voyage) {
   let m = setup.reduce((a, c) => a + c.morale, 0) + ship.morale;
   let c = setup.reduce((a, c) => a + c.combat, 0) + ship.combat;
   let s = setup.reduce((a, c) => a + c.seafaring, 0) + ship.seafaring;
+
+  console.log("morale: " + m);
+  console.log("combat: " + c);
+  console.log("seafaring: " + s);
 
   let ratio =
     Math.min(m / voyage.morale, 1) +
