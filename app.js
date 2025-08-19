@@ -196,13 +196,15 @@ function calculateSuccess(setup, voyage) {
   let c = setup.reduce((a, c) => a + c.combat, 0) + ship.combat;
   let s = setup.reduce((a, c) => a + c.seafaring, 0) + ship.seafaring;
 
-  let ratio =
-    Math.min(m / voyage.morale, 1) +
-    Math.min(c / voyage.combat, 1) +
-    Math.min(s / voyage.seafaring, 1);
+  let moraleRatio = Math.min(m / voyage.morale, 1);
+  let combatRatio = Math.min(c / voyage.combat, 1);
+  let seafaringRatio = Math.min(s / voyage.seafaring, 1);
 
-  return Math.round((ratio / 3) * 100);
+  let lowest = Math.min(moraleRatio, combatRatio, seafaringRatio);
+
+  return Math.round(lowest * 100);
 }
+
 
 function findBestCrew(voyage) {
   let best = [];
