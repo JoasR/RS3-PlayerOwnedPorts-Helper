@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ports Crew Optimizer</title>
+  <script src="https://runeapps.org/alt1lib.js"></script>
+  <script defer src="app.js"></script>
+  <style>
+    body { font-family: Arial; background: #1a1a1a; color: white; padding: 10px; }
+    input { margin: 3px; width: 80px; }
+    button { margin: 5px; }
+    .section { margin-bottom: 15px; padding: 10px; background: #2a2a2a; border-radius: 8px; }
+    .crew { margin: 5px 0; padding: 5px; background: #333; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h2>⚓ Ports Crew Optimizer</h2>
+
+  <!-- Crew Input -->
+  <div class="section">
+    <h3>Add Crew</h3>
+    <input id="name" placeholder="Name">
+    <input id="morale" type="number" placeholder="Morale">
+    <input id="combat" type="number" placeholder="Combat">
+    <input id="seafaring" type="number" placeholder="Seafaring">
+    <button onclick="addCrew()">Add</button>
+
+    <h3>Crew Roster</h3>
+    <div id="crewList"></div>
+  </div>
+
+  <!-- Captain Input -->
+  <div class="section">
+    <h3>Add Captain</h3>
+    <input id="captainName" placeholder="Name">
+    <input id="captainMorale" type="number" placeholder="Morale">
+    <input id="captainCombat" type="number" placeholder="Combat">
+    <input id="captainSeafaring" type="number" placeholder="Seafaring">
+    <button onclick="addCaptain()">Add</button>
+
+    <h3>Captain Roster</h3>
+    <div id="captainList"></div>
+  </div>
+
+
+<!-- Ship Upgrades -->
+<div class="section">
+  <h3>Ship Upgrades</h3>
+  <p>Select the upgrades your ship is using:</p>
+
+  <div>
+    <h4>Deck Items 1</h4>
+    <div id="Deck1"></div>
+  </div>
+
+  <div>
+    <h4>Deck Items 2</h4>
+    <div id="Deck2"></div>
+  </div>
+
+  <div>
+    <h4>Rudders</h4>
+    <div id="Rudder"></div>
+  </div>
+
+  <div>
+    <h4>Rams / Figureheads</h4>
+    <div id="Ram"></div>
+  </div>
+
+  <div>
+    <h4>Hulls</h4>
+    <div id="Hull"></div>
+  </div>
+
+  <!-- Totals display -->
+  <p id="shipTotals">Morale: 0 | Combat: 0 | Seafaring: 0</p>
+
+  <button onclick="saveShip()" id="saveShipBtn">Save Ship</button>
+</div>
+
+
+
+  <!-- Voyage Requirements -->
+  <div class="section">
+    <h3>Voyage Requirements</h3>
+    <input id="vmorale" type="number" placeholder="Morale">
+    <input id="vcombat" type="number" placeholder="Combat">
+    <input id="vseafaring" type="number" placeholder="Seafaring">
+    <button onclick="showBestSetups()">Optimize</button>
+  </div>
+
+  <!-- Results -->
+  <div class="section">
+    <h3>Best Setups</h3>
+    <div id="results"></div>
+  </div>
+</body>
+</html>
