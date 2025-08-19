@@ -196,10 +196,6 @@ function calculateSuccess(setup, voyage) {
   let c = setup.reduce((a, c) => a + c.combat, 0) + ship.combat;
   let s = setup.reduce((a, c) => a + c.seafaring, 0) + ship.seafaring;
 
-  console.log("morale: " + m);
-  console.log("combat: " + c);
-  console.log("seafaring: " + s);
-
   let ratio =
     Math.min(m / voyage.morale, 1) +
     Math.min(c / voyage.combat, 1) +
